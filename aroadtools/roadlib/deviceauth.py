@@ -596,7 +596,7 @@ class DeviceAuthentication():
         async with httpx.AsyncClient(transport=self.httptransport, auth = self.httpauth) as session:
             res = await session.post('https://login.microsoftonline.com/common/oauth2/token', data=prt_request_data)
             if res.status_code != 200:
-                errmsg = res.text()
+                errmsg = res.text
                 raise AuthenticationException(errmsg)
                 
             prtdata = res.json()
@@ -703,7 +703,7 @@ class DeviceAuthentication():
 
     async def get_prt_with_refresh_token(self, refresh_token):
         authlib = Authentication()
-        challenge = await authlib.get_srv_challenge()['Nonce']
+        challenge = (await authlib.get_srv_challenge())['Nonce']
 
         payload = {
             "client_id": "29d9ed98-a469-4536-ade2-f981bc1d605e",

@@ -49,7 +49,7 @@ setup(
 		'asn1crypto',
 		'cryptography',
 		'sqlalchemy',
-        'jwt',
+        'PyJWT',
         'httpx',
 	],
 	entry_points={
