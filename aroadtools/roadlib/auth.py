@@ -1201,7 +1201,7 @@ class Authentication():
                 elif restype == 'content':
                     resdata = response.content()
                 elif restype == 'text':
-                    resdata = response.text()
+                    resdata = response.text
                 else:
                     resdata = response.text()
 
