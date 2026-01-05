@@ -1048,7 +1048,7 @@ class Authentication():
             tokenobject['expiresOn'] = (datetime.datetime.now() + datetime.timedelta(seconds=int(tokenreply['expires_in']))).strftime('%Y-%m-%d %H:%M:%S')
 
         tokenparts = tokenreply['access_token'].split('.')
-        inputdata = json.loads(base64.b64decode(tokenparts[1]+('='*(len(tokenparts[1])%4))))
+        inputdata = json.loads(base64.urlsafe_b64decode(tokenparts[1]+('='*(len(tokenparts[1])%4))))
         try:
             tokenobject['tenantId'] = inputdata['tid']
         except KeyError:
@@ -1069,6 +1069,8 @@ class Authentication():
         for newname, oldname in translate_map.items():
             if newname in tokenreply:
                 tokenobject[oldname] = tokenreply[newname]
+        if 'expires_in' in tokenreply:
+            tokenobject['expiresIn'] = int(tokenreply['expires_in'])
         return tokenobject
 
     @staticmethod
