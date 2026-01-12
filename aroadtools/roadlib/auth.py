@@ -1048,7 +1048,30 @@ class Authentication():
             tokenobject['expiresOn'] = (datetime.datetime.now() + datetime.timedelta(seconds=int(tokenreply['expires_in']))).strftime('%Y-%m-%d %H:%M:%S')
 
         tokenparts = tokenreply['access_token'].split('.')
-        inputdata = json.loads(base64.urlsafe_b64decode(tokenparts[1]+('='*(len(tokenparts[1])%4))))
+
+        try:
+            # Attempt 1: Standard base64 decode
+            decoded_bytes = base64.b64decode(tokenparts[1] + ('=' * (len(tokenparts[1]) % 4)))
+            inputdata = json.loads(decoded_bytes)
+            print("Successfully decoded with standard base64.")
+
+        except (binascii.Error, json.JSONDecodeError) as e:
+            # If standard base64 fails (e.g., due to malformed input or not being standard base64)
+            # or if the decoded bytes aren't valid JSON, try URL-safe.
+            print(f"Standard base64 decode failed or JSON invalid: {e}. Trying URL-safe base64...")
+            try:
+                # Attempt 2: URL-safe base64 decode
+                decoded_bytes = base64.urlsafe_b64decode(tokenparts[1] + ('=' * (len(tokenparts[1]) % 4)))
+                inputdata = json.loads(decoded_bytes)
+                print("Successfully decoded with URL-safe base64.")
+            except (binascii.Error, json.JSONDecodeError) as e:
+                # If URL-safe also fails
+                print(f"URL-safe base64 decode also failed or JSON invalid: {e}.")
+                print("Could not decode and parse input data using either method.")
+                # You might want to raise the exception again or handle it further
+                # raise # Re-raise the last exception if you want the program to stop here
+
+
         try:
             tokenobject['tenantId'] = inputdata['tid']
         except KeyError:
